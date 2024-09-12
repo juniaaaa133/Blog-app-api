@@ -19,3 +19,4 @@ route.put(
 )
 route.delete("/blogs/:id",deleteBlog)
 
+module.exports = route;

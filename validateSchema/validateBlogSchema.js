@@ -1,51 +1,33 @@
 exports.validateBlogSchema = {
     title : {
-        isEmpty  : {
+        notEmpty  : {
         errorMessage : "Title must not be empty"
-        },
-        isString : {
-            errorMessage : "Title field must be string"
         }
     },
     overview : {
-        isEmpty  : {
+        notEmpty  : {
          errorMessage : "Overview must not be empty"
-            },
-        isString : {
-           errorMessage : "Overview field must be string"
             }
     },
     releasedDate : {
-        isEmpty  : {
+        notEmpty  : {
             errorMessage : "Released Date must not be empty"
-         },
-         isString : {
-            errorMessage : "Released Date field must be string"
-            }
+         }
     },
     gameUrl : {
-        isEmpty  : {
+        notEmpty  : {
             errorMessage : "Url must not be empty"
-         },
-        isUrl : {
-            errorMessage : "Please put valid url link."
-        }
+         }
     },
     rating : {
-        isEmpty  : {
+        notEmpty  : {
             errorMessage : "Rating field must not be empty"
-         },
-         isNumber : {
-            errorMessage : "Rating field field must be number"
-            }
+         }
     },
     size: {
-        isEmpty  : {
+        notEmpty  : {
             errorMessage : "Size field must not be empty"
-         },
-         isNumber : {
-            errorMessage : "Size field field must be string"
-            }
+         }
     },
     // icon : {
     //     type : String,
