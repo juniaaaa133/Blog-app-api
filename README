@@ -1,0 +1,26 @@
+A game review blog -> (postDate,title,poster,backdrops[],overview,gameUrl,release,rating,size,type)
+
+FEATURES
+--------
+Search bar,
+Filter bar,
+
+Types
+-----
+Most Populars
+Similars
+Newest
+
+ADMIN
+------
+Admin auth,
+Blog CRUD,
+
+ACCOUNTS
+-----
+username,
+email,
+type,
+joined date,
+pfp,
+isSuspended
