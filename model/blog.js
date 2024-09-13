@@ -37,10 +37,10 @@ const blogSchema = new Schema({
         type :String,
         required: true
     },
-    // category : {
-    //     type : new Schema.Types.ObjectId,
-    //     required : true,
-    // }
+    category : {
+        type : Schema.Types.ObjectId,
+        ref : "Category",
+    }
 })
 
 module.exports = model("Blog",blogSchema)

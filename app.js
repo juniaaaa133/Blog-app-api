@@ -5,6 +5,7 @@ const cors = require("cors")
 const multer = require('multer')
 const mongoose = require("mongoose");
 const blogRoute = require('./route/blogRouter');
+const categoryRoute = require('./route/categoryRouter');
 
 const app = express();
 
@@ -37,6 +38,8 @@ app.use(multer({storage }).fields([
 ]))
 
  app.use("/api",blogRoute)
+ app.use("/api",categoryRoute)
+
 
 mongoose.connect(process.env.MONGO_DB)
 .then(()=>{

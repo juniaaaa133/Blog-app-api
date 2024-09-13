@@ -12,7 +12,7 @@ Blog.countDocuments()
     totalNoteCount = count;
     pages =Math.ceil(count / pagination)
     return Blog.find()
-    // .populate("category")
+    .populate("category")
     .limit(pagination)
     // .sort({createdAt : -1})
     .skip((page -1) * pagination)
