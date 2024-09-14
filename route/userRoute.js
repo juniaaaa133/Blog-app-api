@@ -5,6 +5,8 @@ const route = Router();
 //Default routes
 route.post("/login"); //both user and admin can login
 route.post("/register"); //only users can signup
+route.post('/forgot') //send email for reset password page;
+route.post('/reset-password/:token') //authorize by token for changing password page;
 
 //admin routes
 route.get("/users"); //Admin can see all users;

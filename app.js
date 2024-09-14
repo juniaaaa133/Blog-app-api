@@ -40,7 +40,6 @@ app.use(multer({storage }).fields([
  app.use("/api",blogRoute)
  app.use("/api",categoryRoute)
 
-
 mongoose.connect(process.env.MONGO_DB)
 .then(()=>{
     app.listen(8000,()=>{

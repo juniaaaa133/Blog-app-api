@@ -12,7 +12,7 @@ Blog.countDocuments()
     totalNoteCount = count;
     pages =Math.ceil(count / pagination)
     return Blog.find()
-    .populate("category")
+    .populate("categories","name")
     .limit(pagination)
     // .sort({createdAt : -1})
     .skip((page -1) * pagination)
@@ -29,12 +29,42 @@ Blog.countDocuments()
 })
 .catch((err)=>{
     console.log(res,req)
-    res.status(404).send("Please check your request again.")
+    res.status(404).send(err)
     return res.end();
 })
 }
 
 exports.createBlog = (req,res) => {
+let {
+    title,
+    // overview,
+    // releasedDate,
+    // gameUrl,
+    // rating,
+    // size,
+    categories //[232323,4343434, 34343434,...] means [_id,_id,_id,..]
+} = req.body;
+
+// let {icon,backdrop} = req.file.filename;
+
+Blog.create({
+    title,
+    categories
+    // overview,
+    // releasedDate,
+    // gameUrl,
+    // rating,
+    // size,
+})
+.then(()=>{
+    res.status(201).send("Created successfully.")
+    res.end();
+})
+.catch((err)=>{
+    res.status(500).send(err)
+    res.end()
+})
+
 
 }
 exports.showBlog = (req,res) => {
