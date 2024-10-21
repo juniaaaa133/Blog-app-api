@@ -27,7 +27,8 @@ exports.createCategory = (req,res) => {
 
 exports.showCategory = (req,res) => {
     let {id} = req.params;
-    Category.findById(id)
+    Category.findOne({name : id})
+    .populate("blogs")
     .then((category) => {
      Blog.find({category : category._id})
     .then((blogs) => {

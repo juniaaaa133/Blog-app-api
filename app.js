@@ -6,12 +6,14 @@ const multer = require('multer')
 const mongoose = require("mongoose");
 const blogRoute = require('./route/blogRouter');
 const categoryRoute = require('./route/categoryRouter');
+const path = require("path");
+const userRoute = require('./route/userRoute');
 
 const app = express();
 
 const storage = multer.diskStorage({
     destination : (req,file,cb) => {
-        cb(null,'uploads')
+    cb(null,'uploads')
     },
     filename : (req,file,cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
@@ -21,6 +23,7 @@ const storage = multer.diskStorage({
 
 app.use(cors())
 app.use(bodyParser.urlencoded({extended :false}))
+app.use('/api/uploads',express.static(path.join(__dirname,'uploads')))
 app.use(bodyParser.json())
 app.use(multer({storage }).fields([
     {
@@ -39,6 +42,7 @@ app.use(multer({storage }).fields([
 
  app.use("/api",blogRoute)
  app.use("/api",categoryRoute)
+ app.use("/api",userRoute)
 
 mongoose.connect(process.env.MONGO_DB)
 .then(()=>{

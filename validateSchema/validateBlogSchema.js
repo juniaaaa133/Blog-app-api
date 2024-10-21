@@ -4,6 +4,11 @@ exports.validateBlogSchema = {
         errorMessage : "Title must not be empty"
         }
     },
+    intro : {
+        notEmpty  : {
+            errorMessage : "Overview must not be empty"
+               }
+    },
     overview : {
         notEmpty  : {
          errorMessage : "Overview must not be empty"
@@ -29,16 +34,19 @@ exports.validateBlogSchema = {
             errorMessage : "Size field must not be empty"
          }
     },
-    // icon : {
-    //     type : String,
-    //     required: true
-    // },
-    // backdrop : {
-    //     type :String,
-    //     required: true
-    // },
-    // category : {
-    //     type : new Schema.Types.ObjectId,
-    //     required : true,
-    // }
+    icon : {
+        isMimeType  : {
+            errorMessage : "Icon field must be mime type."
+         }
+    },
+    backdrop : {
+        notEmpty  : {
+            errorMessage : "Backdrop field must be mime type."
+         }
+    },
+    categories : {
+        notEmpty  : {
+            errorMessage : "Category field must not be empty"
+         }
+    }
 }
