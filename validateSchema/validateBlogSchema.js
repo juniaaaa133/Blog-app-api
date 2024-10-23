@@ -34,16 +34,6 @@ exports.validateBlogSchema = {
             errorMessage : "Size field must not be empty"
          }
     },
-    icon : {
-        isMimeType  : {
-            errorMessage : "Icon field must be mime type."
-         }
-    },
-    backdrop : {
-        notEmpty  : {
-            errorMessage : "Backdrop field must be mime type."
-         }
-    },
     categories : {
         notEmpty  : {
             errorMessage : "Category field must not be empty"
