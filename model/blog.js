@@ -49,11 +49,6 @@ const blogSchema = new Schema({
     createdAt : {
     type : Date,
     }
-
-    // category : {
-    //     type : Schema.Types.ObjectId,
-    //     ref : "Category",
-    // }
 })
 
 module.exports = model("Blog",blogSchema)
