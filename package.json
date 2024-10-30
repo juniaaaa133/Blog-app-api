@@ -16,6 +16,6 @@
     },
     "scripts": {
         "build": "npm install",
-        "start" : "node app.js"
+        "start" : "node --watch app.js"
     }
 }

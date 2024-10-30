@@ -3,6 +3,7 @@ const Blog = require("../model/blog")
 const Category = require("../model/category")
 const deleteFile = require("../utils/deleteFile")
 const path = require("path")
+const { v2 : cloudinary } = require('cloudinary');
 
 exports.getAllBlogs = (req,res) => {
     // blogs?page=1,2,..
@@ -128,7 +129,9 @@ err
 })
 }
 
-exports.createBlog = (req,res) => {
+exports.createBlog = async (req,res) => {
+let iconToStore;
+let backdropToStore;
 let {
     intro,
     title,
@@ -160,37 +163,38 @@ backdrop.mimetype !== "image/png" &&
 backdrop.mimetype !== "image/jpeg" &&
 backdrop.mimetype !== "image/jpg" 
 ){
-icon ?
-deleteFile(path.join(__dirname,'..','uploads',icon.filename))
-: backdrop &&
-deleteFile(path.join(__dirname,'..','uploads',backdrop.filename))
 res.status(400).send("Image should be png,jpg or jpeg.")
 return res.end()
 }
 
-Blog.create({
-    title,
-    categories : JSON.parse(categories),
-    overview,
-    releasedDate,
-    isOnline : isOnline ? isOnline : null,
-    gameUrl,
-    rating,
-    size,
-    icon : icon.path,
-    backdrop : backdrop.path,
-    intro,
-    createdAt : Date.now()
-    
+try {
+await cloudinary.uploader.upload(icon.path,(err,result) => {
+iconToStore = result.secure_url;
 })
-.then(()=>{
-    res.status(201).send("Created successfully.")
-    res.end();
+await cloudinary.uploader.upload(backdrop.path,(err,result) => {
+backdrop = result.secure_url;
 })
-.catch((err)=>{
-    res.status(500).send(err)
-    res.end()
+
+await Blog.create({
+title,
+categories : JSON.parse(categories),
+overview,
+releasedDate,
+isOnline : isOnline ? isOnline : null,
+gameUrl,
+rating,
+size,
+icon : iconToStore,
+backdrop : backdropToStore,
+intro,
+createdAt : Date.now()
 })
+res.status(201).send("Created successfully.")
+return res.end();
+} catch (error) {
+res.status(500).send("Something went wrong.")
+res.end()
+}
 
 }
 
@@ -208,7 +212,7 @@ Blog.findById(id)
 })
 }
 
-exports.updateBlog = (req,res) => {
+exports.updateBlog = async (req,res) => {
 let {
  title,
 overview,
@@ -220,11 +224,10 @@ size,
 intro,
 categories //[232323,4343434, 34343434,...] means [_id,_id,_id,..]
  } = req.body;
- const {id} = req.params;
+ let {id} = req.params;
 
- let icon =req.files.icon && req.files.icon[0];
+ let icon = req.files.icon && req.files.icon[0];
  let backdrop =req.files.backdrop && req.files.backdrop[0];
- 
  const errorMsg = validationResult(req)
  
  if(!errorMsg.isEmpty()){
@@ -242,25 +245,31 @@ backdrop && backdrop.mimetype !== "image/png" &&
 backdrop && backdrop.mimetype !== "image/jpeg" &&
 backdrop && backdrop.mimetype !== "image/jpg" 
 ){
-icon ?
-deleteFile(path.join(__dirname,'..','uploads',icon.filename))
-: backdrop &&
-deleteFile(path.join(__dirname,'..','uploads',backdrop.filename))
 res.status(400).send("Image should be png,jpg or jpeg.")
 return res.end()
  }
-
-Blog.findById(id)
-.then((blog)=>{
+try {
+let blog = await Blog.findById(id)
 if(categories){
 blog.categories = JSON.parse(categories);
 }
-if(backdrop){
-blog.backdrop = backdrop.path;
-}
 if(icon){
-blog.icon = icon.path;
+await cloudinary.uploader.upload(icon.path,(err,result) => {
+if(!err){
+blog.icon = result.secure_url;
+console.log(blog.icon , "ICONNn")
 }
+})
+}
+if(backdrop){
+await cloudinary.uploader.upload(backdrop.path,(err,result) => {
+if(!err){
+blog.backdrop = result.secure_url;
+console.log(blog.backdrop,'backkk');
+}
+})
+}
+
 blog.title = title;
 blog.isOnline = isOnline;
 blog.overview = overview;
@@ -269,32 +278,26 @@ blog.gameUrl = gameUrl;
 blog.rating = rating;
 blog.size = size;
 blog.intro = intro;
-blog.save();
- })
-.then(()=>{
+blog.save(); 
 res.status(200).send("Successfully updated.")
-res.end();
-})
-.catch((err)=>{
-    res.status(500).send(err)
-    res.end()
-})}
+return res.end();
+} catch (er) {
+res.status(500).send(err)
+res.end()
+}
+}
 
-exports.deleteBlog = (req,res) => {
+exports.deleteBlog = async (req,res) => {
 const {id} = req.params;
-
-Blog.findById(id)
-.then((blog)=>{
-deleteFile(path.join(__dirname,"..",blog.icon))
-deleteFile(path.join(__dirname,"..",blog.backdrop))
-Blog.findByIdAndDelete(id)
-.then(()=>{
+try {
+let blog = await Blog.findById(id);
+await cloudinary.uploader.destroy(blog.icon)
+await cloudinary.uploader.destroy(blog.backdrop)
+await Blog.findByIdAndDelete(id)
 res.status(204);
-res.end();
-})
-})
-.catch((err)=>{
-    res.status(500).send(err)
-    res.end()
-})
+return res.end();
+} catch (error) {
+res.status(500).send(err)
+res.end()
+}
 }

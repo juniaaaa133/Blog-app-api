@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken")
 const mail = require("nodemailer")
+const { v2 : cloudinary } = require('cloudinary');
 
 require("dotenv").config();
 
@@ -27,7 +28,7 @@ if(type == 'register'){
 <div></div>
 <div></div>
 
-<h2>Mobocatအား registerလုပ်ပေးသည့်အတွက်ကျေးဇူးအထူးပါဗျ။.</h2>
+<h2>Mobocatအား registerလုပ်ပေးသည့်အတွက်ကျေးဇူးအထူးတင်ပါသည်။.</h2>
 <a target="_blank" href="http://localhost:5173/verify-user/${token}">နောက်ဆုံးအဆင့်အနေနဲ့ ဒီlinkလေးထဲကိုဝင်ပေးလိုက်ရင်ရပါပြီ။.</a>
 <b>Mobocat</b>
 
@@ -248,11 +249,11 @@ message : "Failed."
 })
 }
 
-exports.deleteUser = (req,res) => {
+exports.deleteUser = async (req,res) => {
 const {email} = req.params;
 
-User.findOne({email})
-.then((user) => {
+try {
+let user = await User.findOne({email})
 if(!user){
 res.status(401).json({
 success : false,
@@ -260,27 +261,29 @@ message : "Unknown user."
 })
 return res.end();
 }
-User.findOneAndDelete({email})
+await cloudinary.uploader.destroy(user.pfp)
+await User.findOneAndDelete({email})
 .then(()=>{
 res.status(204)
 res.end();
 })
-})
-.catch((err) => {
+} catch (error) {
 res.status(401).json({
 success : false,
 message : "Unknown user."
 })
 res.end();
-})
 }
 
-exports.updateUser = (req,res) => {
+}
+
+exports.updateUser = async (req,res) => {
 const {email} = req.params;
 const {
     username,
     role,
 } = req.body;
+let userPfp = null;
 
 const pfp = req.files && req.files.pfp ? req.files.pfp[0] : null;
 
@@ -297,13 +300,11 @@ pfp.mimetype !== "image/jpeg" &&
 pfp.mimetype !== "image/jpg" &&
 pfp.mimetype !== "image/png" 
 ){
-deleteFile(path.join(__dirname,'..','uploads',pfp.filename))
 res.status(400).send("Image should be png,jpg or jpeg.")
 return res.end()
 }
-
-User.findOne({email})
-.then((user) => {
+try {
+let user = await User.findOne({email})
 if(!user){
 res.status(401).json({
 success : false,
@@ -311,23 +312,27 @@ message : "Unknown user."
 })
 return res.end()
 }
+if(pfp){
+await cloudinary.uploader.upload(pfp.path,(err,result) => {
+userPfp = result.secure_url;
+});
+}
 user.username = username;
 user.role = role;
-user.pfp = pfp !== null ? pfp.path : null;
+user.pfp = userPfp;
 user.save();
+
 res.status(200).json({
 success : true,
 user,
 })
 return res.end()
-})
-.catch((err) => {
+} catch (error) {
 res.status(401).json({
 success : false,
 message: "Unknown user."
 })
  res.end()
-})
-
+}
 }
 
